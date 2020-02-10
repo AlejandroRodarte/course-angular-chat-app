@@ -40,6 +40,17 @@
     *ngIf="conectado"
   >
 
+    <ul class="list-group list-group-flush">
+
+      <li
+        class="list-group-item list-group-item-light"
+        *ngFor="let mensaje of mensajes"
+      >
+        {{ mensaje.fecha | date:'shortTime' }} : {{ mensaje.texto }}
+      </li>
+
+    </ul>
+
   </div>
 
   <div
@@ -56,11 +67,13 @@
           class="form-control"
           placeholder="Escribe un mensaje..."
           name="text"
+          [(ngModel)]="mensaje.texto"
         >
 
         <button
           class="btn btn-primary ml-3"
           type="submit"
+          (click)="enviarMensaje()"
         >
           Enviar
         </button>

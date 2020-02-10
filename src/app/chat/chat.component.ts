@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Client } from '@stomp/stompjs';
 import * as SockJS from 'sockjs-client';
+import { Mensaje } from './models/mensaje';
 
 @Component({
   selector: 'app-chat',
@@ -13,6 +14,10 @@ export class ChatComponent implements OnInit {
 
   public conectado = false;
 
+  public mensaje: Mensaje = new Mensaje();
+
+  public mensajes: Mensaje[] = [];
+
   constructor() { }
 
   ngOnInit() {
@@ -24,8 +29,23 @@ export class ChatComponent implements OnInit {
 
     // run function on connect
     this.client.onConnect = frame => {
+
       console.log(`Conectados: ${this.client.connected} : ${frame}`);
       this.conectado = true;
+
+      // subscribe to /chat/mensaje whenever the spring broker sends information through it (@SendTo)
+      this.client.subscribe('/chat/mensaje', e => {
+
+        // from the event body we can get the payload
+        const mensaje: Mensaje = JSON.parse(e.body);
+
+        mensaje.fecha = new Date(mensaje.fecha);
+
+        this.mensajes.push(mensaje);
+        console.log(mensaje);
+
+      });
+
     };
 
     // run function on disconnect
@@ -44,6 +64,19 @@ export class ChatComponent implements OnInit {
   desconectar(): void {
     // disconnect from the broker
     this.client.deactivate();
+  }
+
+  enviarMensaje(): void {
+
+    // send message to broker to /app/mensaje
+    // server listens to this destination through @MessageMapping
+    this.client.publish({
+      destination: '/app/mensaje',
+      body: JSON.stringify(this.mensaje)
+    });
+
+    this.mensaje.texto = '';
+
   }
 
 }
