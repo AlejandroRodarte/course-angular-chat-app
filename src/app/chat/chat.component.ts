@@ -11,6 +11,8 @@ export class ChatComponent implements OnInit {
 
   private client: Client;
 
+  public conectado = false;
+
   constructor() { }
 
   ngOnInit() {
@@ -20,12 +22,28 @@ export class ChatComponent implements OnInit {
     this.client = new Client();
     this.client.webSocketFactory = () => new SockJS('http://localhost:8080/chat-websocket');
 
+    // run function on connect
+    this.client.onConnect = frame => {
+      console.log(`Conectados: ${this.client.connected} : ${frame}`);
+      this.conectado = true;
+    };
+
+    // run function on disconnect
+    this.client.onDisconnect = frame => {
+      console.log(`Desconectados: ${!this.client.connected} : ${frame}`);
+      this.conectado = false;
+    };
+
+  }
+
+  conectar(): void {
     // connect to the broker
     this.client.activate();
+  }
 
-    // run function on connect
-    this.client.onConnect = frame => console.log(`Conectados: ${this.client.connected} : ${frame}`);
-
+  desconectar(): void {
+    // disconnect from the broker
+    this.client.deactivate();
   }
 
 }
