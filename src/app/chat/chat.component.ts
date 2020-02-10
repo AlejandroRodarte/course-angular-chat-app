@@ -46,6 +46,13 @@ export class ChatComponent implements OnInit {
 
       });
 
+      this.mensaje.tipo = 'NUEVO_USUARIO';
+
+      this.client.publish({
+        destination: '/app/mensaje',
+        body: JSON.stringify(this.mensaje)
+      });
+
     };
 
     // run function on disconnect
@@ -67,6 +74,8 @@ export class ChatComponent implements OnInit {
   }
 
   enviarMensaje(): void {
+
+    this.mensaje.tipo = 'MENSAJE';
 
     // send message to broker to /app/mensaje
     // server listens to this destination through @MessageMapping

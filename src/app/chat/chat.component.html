@@ -4,6 +4,21 @@
 
     <ul class="nav nav-pills card-header-pills">
 
+      <li
+        class="nav-item mr-2"
+        *ngIf="!conectado"
+      >
+
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Escribe tu nombre..."
+          name="username"
+          [(ngModel)]="mensaje.username"
+        >
+
+      </li>
+
       <li class="nav-item mr-2">
 
         <button
@@ -11,6 +26,7 @@
           type="button"
           (click)="conectar()"
           *ngIf="!conectado"
+          [disabled]="!mensaje.username"
         >
           Conectar
         </button>
@@ -46,7 +62,15 @@
         class="list-group-item list-group-item-light"
         *ngFor="let mensaje of mensajes"
       >
-        {{ mensaje.fecha | date:'shortTime' }} : {{ mensaje.texto }}
+
+        <span *ngIf="mensaje.tipo === 'NUEVO_USUARIO'">
+          {{ mensaje.fecha | date:'shortTime' }} : @ {{ mensaje.texto }} {{ mensaje.username }}
+        </span>
+
+        <span *ngIf="mensaje.tipo === 'MENSAJE'">
+          {{ mensaje.fecha | date:'shortTime' }} {{ mensaje.username }} dice : <br> {{ mensaje.texto }}
+        </span>
+
       </li>
 
     </ul>
@@ -66,7 +90,7 @@
           type="text"
           class="form-control"
           placeholder="Escribe un mensaje..."
-          name="text"
+          name="mensaje"
           [(ngModel)]="mensaje.texto"
         >
 
