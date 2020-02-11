@@ -18,6 +18,8 @@ export class ChatComponent implements OnInit {
 
   public mensajes: Mensaje[] = [];
 
+  public escribiendo: string;
+
   constructor() { }
 
   ngOnInit() {
@@ -52,6 +54,11 @@ export class ChatComponent implements OnInit {
         this.mensajes.push(mensaje);
         console.log(mensaje);
 
+      });
+
+      this.client.subscribe('/chat/escribiendo', e => {
+        this.escribiendo = e.body;
+        setTimeout(() => this.escribiendo = null, 3000);
       });
 
       this.mensaje.tipo = 'NUEVO_USUARIO';
@@ -94,6 +101,14 @@ export class ChatComponent implements OnInit {
 
     this.mensaje.texto = '';
 
+  }
+
+  // send data to @MessageMapping("/app/escribiendo")
+  escribiendoEvento(): void {
+    this.client.publish({
+      destination: '/app/escribiendo',
+      body: this.mensaje.username
+    });
   }
 
 }
